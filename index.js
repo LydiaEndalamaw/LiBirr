@@ -16,8 +16,11 @@ app.use('/user',userRoutes)
 app.use('/wallet',walletRoutes)
 app.use('/transaction',userRoutes)
 app.use('/transaction',transactionRoutes)
+app.get("/welcome",(req,res,next)=>{
+  return res.status(200).json({message: "Welcome to LiBirr Mobile Wallet"})
+})
 
 app.listen(PORT, () => {
-  sequelize.sync({alert: true}) 
+  // sequelize.sync({alert: true}) 
   console.log(`Server started on http://localhost:${PORT}`);
 });
