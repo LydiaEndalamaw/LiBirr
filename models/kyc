@@ -1,0 +1,57 @@
+const { DataTypes }= require("sequelize")
+const sequelize = require("../configs/db.configs");
+
+const Transaction = sequelize.define("kyc",{
+
+id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true
+    },
+
+    user_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id"
+      }
+    },
+
+    document_type: {
+      type: DataTypes.ENUM("passport", "national_id", "driver_license"),
+      allowNull: false
+    },
+
+    document_number: {
+      type: DataTypes.STRING
+    },
+
+    document_url: {
+      type: DataTypes.STRING
+    },
+
+    status: {
+      type: DataTypes.ENUM("pending", "approved", "rejected"),
+      defaultValue: "pending"
+    },
+
+    verified_at: {
+      type: DataTypes.DATE
+    }
+
+  },)
+
+module.exports=kyc;
+
+
+
+
+
+
+
+
+
+
+
+
