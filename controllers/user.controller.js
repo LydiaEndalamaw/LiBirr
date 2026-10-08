@@ -1,49 +1,80 @@
-const bcrypt = require("bcrypt");
 const User = require("../models/user.model");
-const jwt =  require("jsonwebtoken")
-class UserController {
-  static registerUser = async (req, res, next) => {
-    try {
-      const { name, email, age, password } = req.body;
+const Wallet = require("../models/wallet.model");
+const bcrypt = require("bcrypt"); 
 
-      const hashedPw = await bcrypt.hash(password, 12);
+class UserController {
+  // 1. User Registration Method (Email-Only)
+  static register = async (req, res, next) => {
+    try {
+      const { name, email, password } = req.body;
+
+      if (!name || !email || !password) {
+        return res.status(400).json({ error: "All registration fields are required" });
+      }
+
+      const emailExists = await User.findOne({ where: { email } });
+      if (emailExists) {
+        return res.status(400).json({ error: "Email address is already registered" });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       const newUser = await User.create({
-        name: name,
-        email: email,
-        age: age,
-        password: hashedPw,
+        name,
+        email,
+        password: hashedPassword,
       });
 
-      // Do the database operation
+      // Automatically spin up a starting wallet with a generated wallet number
+      await Wallet.create({
+        user_id: newUser.id,
+        balance: 0.0,
+        walletNumber: "LIB-" + Date.now(),
+      });
 
-      res.json({ message: "User Registered Succesfully", user: newUser });
+      const userResponse = newUser.toJSON();
+      delete userResponse.password;
+
+      return res.status(201).json({
+        message: "User registered successfully",
+        user: userResponse,
+      });
     } catch (error) {
-      console.log("the error is here - ", error);
+      console.error("Registration Error:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
     }
   };
-  static loginUser = async (req,res,next)=>{
-  
-    const { email,password } = req.body;
-    // Do the database operation
-    
-    const user = await User.findOne({where: {email:email}});
-    
-    if(!user){
-        return res.status(404).json({error: "User not found"});
+  // 2. User Login Method
+  static login = async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+      
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+
+      const wallet = await Wallet.findOne({ where: { user_id: user.id } });
+
+      return res.status(200).json({
+        message: "Login successful",
+        user: { id: user.id, name: user.name, email: user.email },
+        balance: wallet ? Number(wallet.balance) : 0.0,
+      });
+    } catch (error) {
+      console.error("Login Error:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
     }
-
-    const isMatch = await bcrypt.compare(password,user.password)
-
-    if(!isMatch){
-        return res.status(401).json({error: "Incorrect Password"});
-
-    }
-    const token = jwt.sign({id: user.id},process.env.JWT_SECRET); 
-    res.json({message :"Login success",user,token});
-}
+  };
 }
 
-
-module.exports = UserController
-
+module.exports = UserController;

@@ -1,9 +1,10 @@
-const app = require("express");
-const router = app.Router();
+const express = require("express");
+const router = express.Router();
+const UserController = require("../controllers/user.controller"); // 👈 Double check this path matches your directory
 
-const userController = require("../controllers/user.controller")
-
-router.post("/register",userController.registerUser)
-router.post("/login",userController.loginUser)
+// Express crashes if these functions evaluate to undefined. 
+// We point them directly to our class's static methods.
+router.post("/register", UserController.register);
+router.post("/login", UserController.login);
 
 module.exports = router;

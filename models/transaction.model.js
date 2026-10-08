@@ -1,12 +1,14 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../configs/db.configs");
-const Wallet = require("../models/wallet.model");
+// Destructure sequelize if exported as { sequelize } from db.configs
+const { sequelize } = require("../configs/db.configs"); 
+const Wallet = require("./wallet.model");
 
 const Transaction = sequelize.define(
   "Transaction",
   {
     id: {
       type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       unique: true,
       primaryKey: true,
     },
@@ -17,42 +19,43 @@ const Transaction = sequelize.define(
         model: Wallet,
         key: "id",
       },
-
-      amount: {
-        type: DataTypes.DECIMAL(18, 2),
-        allowNull: false,
-      },
-      fee: {
-        type: DataTypes.DECIMAL(18, 2),
-        defaultValue: 0,
-      },
-      currency: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      status: {
-        type: DataTypes.ENUM("pending", "completed", "failed"),
-        defaultValue: "pending",
-      },
-      reference: {
-        type: DataTypes.STRING,
-      },
-      description: {
-        type: DataTypes.TEXT,
-      },
-
-      balance: {
-        type: DataTypes.DOUBLE,
-        allowNull: false,
-        defaultValue: 0.0,
-      },
+    },
+    amount: {
+      type: DataTypes.DECIMAL(18, 2),
+      allowNull: false,
+    },
+    fee: {
+      type: DataTypes.DECIMAL(18, 2),
+      defaultValue: 0.0,
+    },
+    currency: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "ETB",
+    },
+    status: {
+      type: DataTypes.ENUM("pending", "completed", "failed"),
+      defaultValue: "completed",
+    },
+    reference: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    balance: {
+      type: DataTypes.DECIMAL(18, 2),
+      allowNull: false,
+      defaultValue: 0.0,
     },
   },
   {
-    timestamp: true,
+    timestamps: true,
     underscored: true,
     tableName: "transactions",
-  },
+  }
 );
 
 module.exports = Transaction;

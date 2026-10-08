@@ -4,7 +4,8 @@ const User = require("../models/user.model");
 const Wallet = require("../models/wallet.model");
 const PaymentMethod = require("./payment_method.model");
 
-const Withdrawal = sequelize.define("Withdrawal", {
+const Withdrawal = sequelize.define(
+  "Withdrawal", {
   id: {
     type: DataTypes.UUID,
     defaultvalue: UUIDV4,

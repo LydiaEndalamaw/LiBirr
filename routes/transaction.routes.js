@@ -1,22 +1,8 @@
-const app = require("express");
-const router = app.Router();
+const express = require("express");
+const router = express.Router();
+const TransactionController = require("../controllers/transaction.controller"); // Or check your exact filename style
 
-router.post("/register",(req,res,next)=>{
-  
-    const { name,email,age,password } = req.body;
-    // Do the database operation
-    
-    res.json({message :"User Registered Succesfully"});
-})
-
-
-
-router.post("/login",(req,res,next)=>{
-  
-    const { email,password } = req.body;
-    // Do the database operation
-    
-    res.json({message :"Login success"});
-})
+// Fetch transaction history for a specific user
+router.get("/history/:userId", TransactionController.getHistory);
 
 module.exports = router;

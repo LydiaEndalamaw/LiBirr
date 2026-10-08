@@ -20,12 +20,18 @@ const User = sequelize.define("User",{
         type: DataTypes.STRING,
         allowNull: false,
     },
-    
+    //phone_number: {
+       // type: DataTypes.STRING,
+        //allowNull: false,
+       // unique: true
+
+    //},
     balance: {
         type: DataTypes.DOUBLE,
         allowNull: false,
         defaultValue: 0.0
     },
+
 
     isActive: {
         type: DataTypes.BOOLEAN,
